@@ -57,6 +57,20 @@ void constrainInPlace(PVector v, PVector min, PVector max)
 	v.z = constrain(v.z, min.z,max.z);
 }
 
+void floorInPlace(PVector v)
+{
+	v.x = floor(v.x);
+	v.y = floor(v.y);
+	v.z = floor(v.z);
+}
+
+void ceilInPlace(PVector v)
+{
+	v.x = ceil(v.x);
+	v.y = ceil(v.y);
+	v.z = ceil(v.z);
+}
+
 // Math   --------------------
 void addInPlace(PVector v1, PVector v2)
 {

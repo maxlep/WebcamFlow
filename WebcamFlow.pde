@@ -8,8 +8,9 @@ int camHeight = 180;		// HD video might bog down our computer
 PVector cameraSize = new PVector(camWidth,camHeight);
 PVector windowSize = new PVector(width,height);
 
-int gridTileSize = 2;		// The camera image is further divided into regions to measure flow
+int gridTileSize = 10;		// The camera image is further divided into regions to measure flow
 							// and we get the average movement in each
+boolean doGridBilinearInterpolation = true;	// Whether to smooth the grid by sampling using bilinear interpolation
 
 int mode = 0;				// Different modes for visualizing the flowmap
 static int modeCount = 5;
@@ -83,5 +84,11 @@ void keyPressed()
 	{
 		initializeFlowMap();
 		background(vectorToColor(HalfColor));
+	} else if (key == 'f')
+	{
+		flipHorizontal = !flipHorizontal;
+	} else if (key == 'b')
+	{
+		doGridBilinearInterpolation = !doGridBilinearInterpolation;
 	}
 }
