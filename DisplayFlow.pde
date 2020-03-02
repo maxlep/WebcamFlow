@@ -15,12 +15,15 @@ void displayFlow(PImage cameraFrame)
             int cameraIndex = windowCoordToCameraIndex(windowCoord);
             int gridIndex = windowCoordToGridIndex(windowCoord);
 
+			// Take samples from the different frames
             PVector flow = colorToVector(flowmap.pixels[gridIndex]);
             float pct = map(flow.y, 0,255, -1,1);
 			PVector cameraSample = colorToVector(cameraFrame.pixels[cameraIndex]);
             cameraSample = PVector.add(cameraSample, new PVector(127,127,127));
             PVector windowSample = colorToVector(pixels[windowIndex]);
             windowSample = PVector.add(windowSample, new PVector(127,127,127));
+
+			// Display results according to the mixing mode
             switch (mode)
             {
                 case 0:
