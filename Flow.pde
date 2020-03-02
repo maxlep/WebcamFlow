@@ -4,7 +4,7 @@ int gridHeight = camHeight/gridTileSize;
 PVector gridSize = new PVector(gridWidth,gridHeight);
 
 PImage flowmap;
-float flowLinger = 0;//0.7;
+float flowLinger = .9;
 
 void initializeFlowMap()
 {

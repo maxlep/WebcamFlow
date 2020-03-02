@@ -1,8 +1,11 @@
 
+boolean flipHorizontal = true;
+
 void coordFrameToCoordFrame(PVector coord, PVector fromFrame, PVector toFrame)
 {
 	coordFrameToCoordFrame(coord, fromFrame, toFrame, true);
 }
+
 PVector coordFrameToCoordFrame(PVector coord, PVector fromFrame, PVector toFrame, boolean inPlace)
 {
 	PVector outCoord = inPlace ? coord : vector(coord);
@@ -10,10 +13,12 @@ PVector coordFrameToCoordFrame(PVector coord, PVector fromFrame, PVector toFrame
 	multInPlace(outCoord, toFrame);
 	return outCoord;
 }
+
 int coordToIndex(PVector coord, PVector frameSize)
 {
 	return floor(coord.y) * int(frameSize.x) + floor(coord.x);
 }
+
 int coordFrametoFrameIndex(PVector coord, PVector fromFrame, PVector toFrame)
 {
 	PVector toCoord = coordFrameToCoordFrame(coord, fromFrame, toFrame, false);
@@ -33,4 +38,9 @@ int windowCoordToCameraIndex(PVector windowCoord)
 int cameraCoordToGridIndex(PVector cameraCoord)
 {
 	return coordFrametoFrameIndex(cameraCoord, cameraSize, gridSize);
+}
+
+void flipHorizontal(PVector coord, PVector frame)
+{
+	coord.x = frame.x - 1 - coord.x;
 }
