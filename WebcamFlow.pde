@@ -8,24 +8,27 @@ int camHeight = 180;		// HD video might bog down our computer
 PVector cameraSize = new PVector(camWidth,camHeight);
 PVector windowSize = new PVector(width,height);
 
-int gridTileSize = 10;		// The camera image is further divided into regions to measure flow
+int gridTileSize = 2;		// The camera image is further divided into regions to measure flow
 							// and we get the average movement in each
 boolean doGridBilinearInterpolation = true;	// Whether to smooth the grid by sampling using bilinear interpolation
 
+int cameraDelayMs = 7000;
 int mode = 0;				// Different modes for visualizing the flowmap
-static int modeCount = 5;
+static int modeCount = 3;
 
 boolean debug = false;		// Debug mode
 
 // Main   --------------------
 OpenCV cv;
 Capture webcam;
+PShader distortionMapShader;
 
 String cameraName;
 
 void setup()
 {
-	size(1280, 720);
+	// size(1280, 720, P2D);
+	fullScreen(P2D);
 	windowSize = new PVector(width,height);
 
 	// Start the webcam
@@ -41,6 +44,15 @@ void setup()
 
 	cv = new OpenCV(this, camWidth,camHeight);		// Create an instance of the OpenCV library
 	initializeFlowMap();							// Initialize the PImage used to store the flow map
+	cameraBuffer = new PImage(camWidth,camHeight);
+
+	// Intialize the shader
+	distortionMapShader = loadShader("DistortionMap.glsl");
+	distortionMapShader.set("u_resolution", windowSize.x,windowSize.y);
+	// distortionMapShader.set("u_cameraResolution", cameraSize.x,cameraSize.y);
+	// distortionMapShader.set("u_flowmapResolution", gridSize.x,gridSize.y);
+	distortionMapShader.set("u_flowmap", flowmap);
+	distortionMapShader.set("u_camera", cameraBuffer);
 }
 
 static int ui_x = 4, ui_y = 12, fontSize = 12;
@@ -67,7 +79,7 @@ void draw()
 			text(String.format("linger: %.2f", flowLinger), ui_x,ui_y+2*fontSize);
 			image(webcam,0,quarterHeight,quarterWidth,quarterHeight);
 			text(cameraName, ui_x,ui_y+quarterHeight);
-			text(String.format("display mode: %d", mode), ui_x+quarterWidth,ui_y);
+			text(String.format("display mode: %d", mode), ui_x+quarterWidth-15*fontSize,ui_y);
 		}
 	}
 }
@@ -77,6 +89,7 @@ void keyPressed()
 	if (key == 'd')
 	{
 		debug = !debug;
+		modeCount += debug ? 1 : -1;
 	} else if (key == 'm') 
 	{
 		mode = (mode + 1) % modeCount;

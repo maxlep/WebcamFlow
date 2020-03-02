@@ -1,6 +1,23 @@
 
+
+int lastCameraUpdateTime = -100;
+PImage cameraBuffer;
+
 void displayFlow(PImage cameraFrame)
 {
+	if (mode == 0) {
+		flowmap.filter(BLUR);
+		distortionMapShader.set("u_flowmap", flowmap);
+		int time = millis();
+		if (time - lastCameraUpdateTime >= cameraDelayMs)
+		{
+			lastCameraUpdateTime = time;
+			cameraBuffer = cameraFrame.copy();
+			distortionMapShader.set("u_camera", cameraBuffer);
+		}
+		filter(distortionMapShader);
+		return;
+	}
 	cameraFrame.loadPixels();
 	flowmap.loadPixels();
 	loadPixels();
@@ -32,9 +49,7 @@ void displayFlow(PImage cameraFrame)
 			// Display results according to the mixing mode
 			switch (mode)
 			{
-				case 0:		// Simple mix of webcam input with flow direction, based on flow intensity
-					PVector motion = mix( cameraSample, flow, 0.5 );
-					pixels[windowIndex] = mixColor( pixels[windowIndex], vectorToColor(motion), pct );
+				case 0:	// Shader above
 					break;
 				case 1:		// Black clouds
 					if (abs(pct) > 0.1) windowSample = PVector.mult(windowSample,pct);
@@ -42,12 +57,17 @@ void displayFlow(PImage cameraFrame)
 					break;
 				case 2:
 					if (abs(pct) < 0.4) pixels[windowIndex] = int(pixels[windowIndex] * pct);
+					if (abs(pct) < 0.3)
+					{
+						windowSample.y = windowSample.x; windowSample.z = windowSample.x;
+					}
+					else multInPlace(windowSample, abs(pct)+1);
+					subInPlace(windowSample, HalfColor);
+					pixels[windowIndex] = vectorToColor(windowSample);
 					break;
-				case 3:
-					pct = max(pct, .1);
-					if (abs(pct) < 0.4) pixels[windowIndex] = int(pixels[windowIndex] * pct);
-					break;
-				case 4:
+				case 3:		// Simple mix of webcam input with flow direction, based on flow intensity
+					PVector motion = mix( cameraSample, flow, 0.5 );
+					pixels[windowIndex] = mixColor( pixels[windowIndex], vectorToColor(motion), pct );
 					break;
 			}
 		}
