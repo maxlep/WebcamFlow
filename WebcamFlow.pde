@@ -11,8 +11,8 @@ PVector windowSize = new PVector(width,height);
 int gridTileSize = 5;		// The camera image is further divided into regions to measure flow
 							// and we get the average movement in each
 
-int mode = 2;				// Different modes for visualizing the flowmap
-static int modeCount = 4;
+int mode = 4;				// Different modes for visualizing the flowmap
+static int modeCount = 5;
 
 boolean debug = false;		// Debug mode
 
@@ -35,6 +35,7 @@ void setup()
 	webcam = new Capture(this, camWidth,camHeight, inputs[0]);//"Integrated_Webcam_HD: Integrate");//"UVC Camera (046d:0825)");
 	webcam.start();
 
+	// windowBuffer = new PImage(int(width),int(height)); // Initialize the image used to store the contents that will be displayed each frame
 	cv = new OpenCV(this, camWidth,camHeight);		// Create an instance of the OpenCV library
 	initializeFlowMap();							// Initialize the PImage used to store the flow map
 }
@@ -44,17 +45,18 @@ void draw()
 	if (webcam.available())
 	{
 		webcam.read();
-		image(webcam, 0,0, width,height);	// Draw the raw webcam image to the screen
+		// image(webcam, 0,0, width,height);	// Draw the raw webcam image to the screen
 
 		cv.loadImage(webcam);
 		cv.calculateOpticalFlow();			// Initialize OpenCV and calculate optical flow
 		updateFlowMap(0.8);					// Sample the flow map on a grid and store to flowmap image
 
-		displayFlow();
+		displayFlow(webcam);
 
 		if (debug)
 		{
 			image(flowmap,0,0,width/4,height/4);
+			image(webcam,0,height/4,width/4,height/4);
 		}
 	}
 }

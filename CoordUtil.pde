@@ -1,8 +1,14 @@
 
 void coordFrameToCoordFrame(PVector coord, PVector fromFrame, PVector toFrame)
 {
-	divideInPlace(coord, fromFrame);
-	multInPlace(coord, toFrame);
+	coordFrameToCoordFrame(coord, fromFrame, toFrame, true);
+}
+PVector coordFrameToCoordFrame(PVector coord, PVector fromFrame, PVector toFrame, boolean inPlace)
+{
+	PVector outCoord = inPlace ? coord : vector(coord);
+	divideInPlace(outCoord, fromFrame);
+	multInPlace(outCoord, toFrame);
+	return outCoord;
 }
 int coordToIndex(PVector coord, PVector frameSize)
 {
@@ -10,13 +16,18 @@ int coordToIndex(PVector coord, PVector frameSize)
 }
 int coordFrametoFrameIndex(PVector coord, PVector fromFrame, PVector toFrame)
 {
-	coordFrameToCoordFrame(coord, fromFrame, toFrame);
-	return coordToIndex(coord, toFrame);
+	PVector toCoord = coordFrameToCoordFrame(coord, fromFrame, toFrame, false);
+	return coordToIndex(toCoord, toFrame);
 }
 
 int windowCoordToGridIndex(PVector windowCoord)
 {
 	return coordFrametoFrameIndex(windowCoord, windowSize, gridSize);
+}
+
+int windowCoordToCameraIndex(PVector windowCoord)
+{
+	return coordFrametoFrameIndex(windowCoord, windowSize, cameraSize);
 }
 
 int cameraCoordToGridIndex(PVector cameraCoord)
