@@ -2,6 +2,8 @@
 
 An interactive program that visualizes optical flow. Created using Processing 3.
 
+![Image of Yaktocat](https://raw.githubusercontent.com/maxlep/WebcamFlow/master/screenshots/Screenshot%20from%202020-03-09%2020-34-19.png)
+
 ## Running
 
 Run the sketch's main file, `WebcamFlow.pde`, with processing-java.
