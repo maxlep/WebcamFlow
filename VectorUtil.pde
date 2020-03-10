@@ -9,6 +9,11 @@ static PVector FullColor = vector(255);
 static PVector vector(float x) { return new PVector(x,x,x); }
 static PVector vector(PVector v) { return new PVector(v.x,v.y,v.z); }
 
+void set(PVector v, float f)
+{
+	v.x = f; v.y = f; v.z = f;
+}
+
 // Color  --------------------
 PVector colorToVector(color c)
 {
@@ -78,6 +83,18 @@ void addInPlace(PVector v1, PVector v2)
 	v1.y += v2.y;
 	v1.z += v2.z;
 }
+PVector addAbs(PVector v1, PVector v2, boolean inPlace)
+{
+	PVector result = inPlace ? v1 : vector(v1);
+	result.x += abs(v2.x);
+	result.y += abs(v2.y);
+	result.z += abs(v2.z);
+	return result;
+}
+void addAbs(PVector v1, PVector v2)
+{
+	addAbs(v1, v2, true);
+}
 void subInPlace(PVector v1, PVector v2)
 {
 	v1.x -= v2.x;
@@ -101,4 +118,10 @@ void divideInPlace(PVector v1, PVector v2)
 	v1.x /= v2.x;
 	v1.y /= v2.y;
 	v1.z /= v2.z;
+}
+void divideInPlace(PVector v, float f)
+{
+	v.x /= f;
+	v.y /= f;
+	v.z /= f;
 }

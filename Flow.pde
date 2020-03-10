@@ -4,7 +4,8 @@ int gridHeight = camHeight/gridTileSize;
 PVector gridSize = new PVector(gridWidth,gridHeight);
 
 PImage flowmap;
-float flowLinger = .9;
+PVector averageFlow;
+float flowLinger = .5;
 
 void initializeFlowMap()
 {
@@ -15,10 +16,12 @@ void initializeFlowMap()
 		flowmap.pixels[i] = vectorToColor(HalfColor);
 	}
 	flowmap.updatePixels();
+	averageFlow = vector(0);
 }
 
 void updateFlowMap(float fillPercent)
 {
+	averageFlow = cv.flow.getAverageFlowInRegion(0,0, camWidth,camHeight);
 	int randMax = gridTileSize * int((1/fillPercent)-1);
 	flowmap.loadPixels();
 	for (int y=gridTileSize; y<camHeight-gridTileSize; y+=gridTileSize)
@@ -30,7 +33,9 @@ void updateFlowMap(float fillPercent)
 			PVector cameraCoord = new PVector(x,y);
 			int gridIndex = cameraCoordToGridIndex(cameraCoord);		// Translate camera coordinates to grid index
 			PVector currentFlow = colorToVector(flowmap.pixels[gridIndex]); // Sample flowmap
-			flowAttenuation(currentFlow, flow, flowLinger);				// Calculate resultant flow
+			// float linger = flowLinger / max(flow.mag(), 1);
+
+			flowAttenuation(currentFlow, flow, flowLinger );				// Calculate resultant flow
 			flowmap.pixels[gridIndex] = vectorToColor(currentFlow);		// Update flowmap value
 			x += int(random(0,randMax));								// Add random to grid increment to reduce updates
 		}

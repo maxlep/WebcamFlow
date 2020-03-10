@@ -1,6 +1,7 @@
 
 
-int lastCameraUpdateTime = -100;
+static int CameraUpdateResetValue = -30000;
+int lastCameraUpdateTime = CameraUpdateResetValue;
 PImage cameraBuffer;
 
 void displayFlow(PImage cameraFrame)
@@ -9,7 +10,8 @@ void displayFlow(PImage cameraFrame)
 		flowmap.filter(BLUR);
 		distortionMapShader.set("u_flowmap", flowmap);
 		int time = millis();
-		if (time - lastCameraUpdateTime >= cameraDelayMs)
+		println(averageFlow);
+		if (time - lastCameraUpdateTime >= cameraDelayMs || averageFlow.mag() > 1.5)
 		{
 			lastCameraUpdateTime = time;
 			cameraBuffer = cameraFrame.copy();

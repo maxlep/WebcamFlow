@@ -3,16 +3,17 @@ import gab.opencv.*;
 import processing.video.*;
 
 // Params --------------------
-int camWidth =  320;		// we'll use a smaller camera resolution, since
-int camHeight = 180;		// HD video might bog down our computer
+int camWidth =  640;		// we'll use a smaller camera resolution, since
+int camHeight = 360;		// HD video might bog down our computer
 PVector cameraSize = new PVector(camWidth,camHeight);
 PVector windowSize = new PVector(width,height);
 
-int gridTileSize = 2;		// The camera image is further divided into regions to measure flow
+int gridTileSize = 4;		// The camera image is further divided into regions to measure flow
 							// and we get the average movement in each
 boolean doGridBilinearInterpolation = true;	// Whether to smooth the grid by sampling using bilinear interpolation
+float distortionStrength = 1;
 
-int cameraDelayMs = 7000;
+int cameraDelayMs = int(10*1000);
 int mode = 0;				// Different modes for visualizing the flowmap
 static int modeCount = 3;
 
@@ -53,6 +54,7 @@ void setup()
 	// distortionMapShader.set("u_flowmapResolution", gridSize.x,gridSize.y);
 	distortionMapShader.set("u_flowmap", flowmap);
 	distortionMapShader.set("u_camera", cameraBuffer);
+	distortionMapShader.set("u_distortionStrength", distortionStrength);
 }
 
 static int ui_x = 4, ui_y = 12, fontSize = 12;
@@ -63,7 +65,7 @@ void draw()
 		webcam.read();
 		cv.loadImage(webcam);
 		cv.calculateOpticalFlow();		// Initialize OpenCV and calculate optical flow
-		updateFlowMap(0.8);				// Sample the optical flow on a grid and store to flowmap image
+		updateFlowMap(1.);				// Sample the optical flow on a grid and store to flowmap image
 
 		displayFlow(webcam);
 
@@ -79,7 +81,7 @@ void draw()
 			text(String.format("linger: %.2f", flowLinger), ui_x,ui_y+2*fontSize);
 			image(webcam,0,quarterHeight,quarterWidth,quarterHeight);
 			text(cameraName, ui_x,ui_y+quarterHeight);
-			text(String.format("display mode: %d", mode), ui_x+quarterWidth-15*fontSize,ui_y);
+			text(String.format("display mode: %d", mode), ui_x+quarterWidth-10*fontSize,ui_y);
 		}
 	}
 }
@@ -97,11 +99,21 @@ void keyPressed()
 	{
 		initializeFlowMap();
 		background(vectorToColor(HalfColor));
+		lastCameraUpdateTime = CameraUpdateResetValue;
 	} else if (key == 'f')
 	{
 		flipHorizontal = !flipHorizontal;
 	} else if (key == 'b')
 	{
 		doGridBilinearInterpolation = !doGridBilinearInterpolation;
+	} else if (key == CODED)
+	{
+		if (keyCode == LEFT) {
+			flowLinger -= 0.1;
+		} else if (keyCode == RIGHT) {
+			flowLinger += 0.1;
+		} else if (keyCode == DOWN) {
+			flowLinger = 0.5;
+		}
 	}
 }
